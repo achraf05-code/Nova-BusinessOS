@@ -2,6 +2,9 @@
 /**
  * xlsx exports for Reports + per-module data dumps. The library is
  * dynamic-imported so it never ships in the marketing bundle.
+ *
+ * We use `xlsx-js-style`, a maintained, audit-clean fork of SheetJS.
+ * Its API surface is identical to `xlsx`.
  */
 import type {
   CrmContact,
@@ -11,8 +14,20 @@ import type {
   Project,
 } from "@/types/database";
 
-async function lib() {
-  return (await import("xlsx")) as typeof import("xlsx");
+interface XlsxLib {
+  utils: {
+    book_new(): unknown;
+    book_append_sheet(wb: unknown, ws: unknown, name: string): void;
+    json_to_sheet(rows: Record<string, unknown>[]): unknown;
+  };
+  write(
+    wb: unknown,
+    opts: { bookType: "xlsx"; type: "array" }
+  ): ArrayBuffer;
+}
+
+async function lib(): Promise<XlsxLib> {
+  return (await import("xlsx-js-style")) as unknown as XlsxLib;
 }
 
 function downloadBuffer(buffer: ArrayBuffer, filename: string) {
