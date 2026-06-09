@@ -1,0 +1,231 @@
+"use client";
+/**
+ * Branded one-page PDF reports — Revenue, Expenses, P&L. Reuses the
+ * dependency-free PDF assembler that powers invoices.
+ */
+import { formatCurrency } from "@/lib/format";
+import type { Expense, Invoice } from "@/types/database";
+
+interface BuildArgs {
+  company: { name: string; currency: string };
+  title: string;
+  rows: readonly { label: string; value: string }[];
+  footer: string;
+}
+
+export function buildReportPdf(args: BuildArgs): Blob {
+  const W = 595;
+  const H = 842;
+  const M = 56;
+
+  const lines: string[] = [];
+  function add(s: string) {
+    lines.push(s);
+  }
+
+  // header bar
+  add(`q 0.27 0.37 1 rg 0 ${H - 80} ${W} 80 re f Q`);
+  add(`q 1 1 1 rg`);
+  add(`BT /F2 22 Tf ${M} ${H - 50} Td (${esc("Nova BusinessOS")}) Tj ET`);
+  add(`BT /F1 11 Tf ${M} ${H - 70} Td (${esc(args.title)}) Tj ET`);
+  add(
+    `BT /F1 10 Tf ${W - M - 200} ${H - 50} Td (${esc(
+      args.company.name
+    )}) Tj ET`
+  );
+  add(`Q`);
+
+  // title
+  let y = H - 130;
+  add(`BT /F2 16 Tf ${M} ${y} Td (${esc(args.title)}) Tj ET`);
+  y -= 20;
+  add(
+    `BT /F1 10 Tf ${M} ${y} Td (${esc(`Generated ${new Date().toLocaleString()}`)}) Tj ET`
+  );
+
+  // rows
+  y -= 30;
+  for (const row of args.rows) {
+    if (y < 100) break;
+    add(`BT /F1 11 Tf ${M} ${y} Td (${esc(row.label)}) Tj ET`);
+    add(`BT /F2 11 Tf ${W - M - 160} ${y} Td (${esc(row.value)}) Tj ET`);
+    y -= 22;
+  }
+
+  // footer
+  add(`BT /F1 9 Tf ${M} 40 Td (${esc(args.footer)}) Tj ET`);
+
+  return assemblePdf(lines.join("\n"));
+}
+
+export function downloadReportPdf(filename: string, args: BuildArgs) {
+  const blob = buildReportPdf(args);
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
+
+/* helpers ------------------------------------------------------------ */
+
+function esc(s: string) {
+  return String(s)
+    .replace(/\\/g, "\\\\")
+    .replace(/\(/g, "\\(")
+    .replace(/\)/g, "\\)")
+    .replace(/[\r\n]/g, " ");
+}
+
+function assemblePdf(content: string): Blob {
+  const objects: string[] = [];
+  const xrefOffsets: number[] = [];
+  const addObj = (body: string) => {
+    const idx = objects.length + 1;
+    objects.push(`${idx} 0 obj\n${body}\nendobj`);
+    return idx;
+  };
+  const fontHelvetica = addObj(
+    `<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>`
+  );
+  const fontHelveticaBold = addObj(
+    `<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold >>`
+  );
+  const contents = addObj(
+    `<< /Length ${content.length} >>\nstream\n${content}\nendstream`
+  );
+  const page = addObj(
+    `<< /Type /Page /Parent 0 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 ${fontHelvetica} 0 R /F2 ${fontHelveticaBold} 0 R >> >> /Contents ${contents} 0 R >>`
+  );
+  const pages = addObj(`<< /Type /Pages /Kids [${page} 0 R] /Count 1 >>`);
+  const catalog = addObj(`<< /Type /Catalog /Pages ${pages} 0 R >>`);
+  objects[page - 1] = objects[page - 1].replace(
+    "/Parent 0 0 R",
+    `/Parent ${pages} 0 R`
+  );
+  let body = "%PDF-1.4\n%\u00E2\u00E3\u00CF\u00D3\n";
+  for (const obj of objects) {
+    xrefOffsets.push(body.length);
+    body += obj + "\n";
+  }
+  const xrefPos = body.length;
+  body += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+  for (const off of xrefOffsets) {
+    body += `${String(off).padStart(10, "0")} 00000 n \n`;
+  }
+  body += `trailer\n<< /Size ${
+    objects.length + 1
+  } /Root ${catalog} 0 R >>\nstartxref\n${xrefPos}\n%%EOF`;
+  return new Blob([body], { type: "application/pdf" });
+}
+
+/* Pre-built reports ------------------------------------------------- */
+
+export function revenueReport(args: {
+  company: { name: string; currency: string };
+  invoices: Invoice[];
+}) {
+  const paid = args.invoices.filter((i) => i.status === "paid");
+  const sent = args.invoices.filter((i) => i.status === "sent");
+  const overdue = args.invoices.filter((i) => i.status === "overdue");
+  const sum = (a: Invoice[]) => a.reduce((s, i) => s + i.total, 0);
+  return {
+    title: "Revenue Report",
+    rows: [
+      { label: "Paid invoices", value: String(paid.length) },
+      {
+        label: "Total paid",
+        value: formatCurrency(sum(paid), args.company.currency),
+      },
+      { label: "Outstanding invoices", value: String(sent.length) },
+      {
+        label: "Total outstanding",
+        value: formatCurrency(sum(sent), args.company.currency),
+      },
+      { label: "Overdue invoices", value: String(overdue.length) },
+      {
+        label: "Total overdue",
+        value: formatCurrency(sum(overdue), args.company.currency),
+      },
+      {
+        label: "All-time invoiced",
+        value: formatCurrency(sum(args.invoices), args.company.currency),
+      },
+    ],
+    footer: `Generated by Nova BusinessOS for ${args.company.name}`,
+    company: args.company,
+  } as const;
+}
+
+export function expenseReport(args: {
+  company: { name: string; currency: string };
+  expenses: Expense[];
+}) {
+  const total = args.expenses.reduce((s, e) => s + e.amount, 0);
+  const byCat = args.expenses.reduce<Record<string, number>>((acc, e) => {
+    acc[e.category] = (acc[e.category] ?? 0) + e.amount;
+    return acc;
+  }, {});
+  const rows: { label: string; value: string }[] = [
+    {
+      label: "Total expenses",
+      value: formatCurrency(total, args.company.currency),
+    },
+    { label: "Transactions", value: String(args.expenses.length) },
+    {
+      label: "Average expense",
+      value: formatCurrency(
+        args.expenses.length ? total / args.expenses.length : 0,
+        args.company.currency
+      ),
+    },
+  ];
+  for (const [cat, value] of Object.entries(byCat)) {
+    rows.push({
+      label: `↳ ${cat[0].toUpperCase() + cat.slice(1)}`,
+      value: formatCurrency(value, args.company.currency),
+    });
+  }
+  return {
+    title: "Expense Report",
+    rows,
+    footer: `Generated by Nova BusinessOS for ${args.company.name}`,
+    company: args.company,
+  } as const;
+}
+
+export function profitLossReport(args: {
+  company: { name: string; currency: string };
+  invoices: Invoice[];
+  expenses: Expense[];
+}) {
+  const revenue = args.invoices
+    .filter((i) => i.status === "paid")
+    .reduce((s, i) => s + i.total, 0);
+  const expenses = args.expenses.reduce((s, e) => s + e.amount, 0);
+  const profit = revenue - expenses;
+  const margin = revenue === 0 ? 0 : Math.round((profit / revenue) * 100);
+  return {
+    title: "Profit & Loss",
+    rows: [
+      {
+        label: "Revenue",
+        value: formatCurrency(revenue, args.company.currency),
+      },
+      {
+        label: "Expenses",
+        value: formatCurrency(expenses, args.company.currency),
+      },
+      {
+        label: "Profit",
+        value: formatCurrency(profit, args.company.currency),
+      },
+      { label: "Margin", value: `${margin}%` },
+    ],
+    footer: `Generated by Nova BusinessOS for ${args.company.name}`,
+    company: args.company,
+  } as const;
+}
