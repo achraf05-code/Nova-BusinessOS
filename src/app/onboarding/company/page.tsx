@@ -1,8 +1,13 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { cookies } from "next/headers";
-import { createClient } from "@/lib/supabase/server";
+import {
+  createAdminClient,
+  createClient,
+} from "@/lib/supabase/server";
+import { supabaseConfigured } from "@/lib/supabase/env";
 import { ACTIVE_COMPANY_COOKIE } from "@/lib/tenant";
+import { getStore, isoNow, newId, DEMO } from "@/lib/demoStore";
 import Label from "@/components/form/Label";
 import Input from "@/components/form/input/InputField";
 import NovaLogo from "@/components/brand/NovaLogo";
@@ -14,26 +19,74 @@ export const metadata: Metadata = {
   description: "Set up your first Nova BusinessOS workspace.",
 };
 
+interface PageProps {
+  searchParams: Promise<{ error?: string }>;
+}
+
 async function createCompanyAction(formData: FormData) {
   "use server";
   const name = String(formData.get("name") ?? "").trim();
   const industry = String(formData.get("industry") ?? "").trim() || null;
-  const currency = String(formData.get("currency") ?? "USD").trim() || "USD";
-  if (!name) return;
+  const currency =
+    String(formData.get("currency") ?? "USD").trim().toUpperCase() || "USD";
 
+  if (!name) {
+    redirect("/onboarding/company?error=name_required");
+  }
+
+  const slug =
+    name
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/(^-|-$)/g, "")
+      .slice(0, 48) +
+    "-" +
+    Math.random().toString(36).slice(2, 6);
+
+  // ---- Demo mode ----
+  if (!supabaseConfigured) {
+    const store = getStore();
+    const id = newId();
+    store.company = {
+      id,
+      owner_id: DEMO.USER_ID,
+      name,
+      slug,
+      logo_url: null,
+      industry,
+      currency,
+      timezone: "UTC",
+      created_at: isoNow(),
+      updated_at: isoNow(),
+    };
+    const c = await cookies();
+    c.set(ACTIVE_COMPANY_COOKIE, id, {
+      path: "/",
+      sameSite: "lax",
+      maxAge: 60 * 60 * 24 * 365,
+    });
+    redirect("/dashboard");
+  }
+
+  // ---- Real Supabase ----
+  // 1. Verify the user with the SSR-cookie client (so we never trust the
+  //    request body for ownership).
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/login");
+  if (!user) {
+    redirect("/login?next=/onboarding/company");
+  }
 
-  const slug = name
-    .toLowerCase()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/(^-|-$)/g, "")
-    .slice(0, 48) + "-" + Math.random().toString(36).slice(2, 6);
-
-  const { data, error } = await supabase
+  // 2. Insert via the **service-role** client. The user-scoped client may
+  //    fail RLS in some Supabase configurations because the JWT context
+  //    isn't always present in Server Actions running outside of the
+  //    request lifecycle. We've already validated the user above, so this
+  //    is safe — `owner_id` is set to the verified `user.id` and the
+  //    `ensure_owner_membership` trigger seeds the matching membership row.
+  const admin = createAdminClient();
+  const { data, error } = await admin
     .from("companies")
     .insert({
       owner_id: user.id,
@@ -42,14 +95,27 @@ async function createCompanyAction(formData: FormData) {
       industry,
       currency,
     } as never)
-    .select("*")
+    .select("id")
     .single();
 
   if (error || !data) {
-    throw new Error(error?.message ?? "Could not create company");
+    const code = encodeURIComponent(
+      error?.message?.slice(0, 200) ?? "unknown_error"
+    );
+    redirect(`/onboarding/company?error=${code}`);
   }
 
+  // 3. Belt-and-braces: ensure the owner membership row exists even if
+  //    the trigger ever gets dropped or disabled.
   const company = data as { id: string };
+  await admin
+    .from("company_members")
+    .upsert(
+      { company_id: company.id, user_id: user.id, role: "owner" } as never,
+      { onConflict: "company_id,user_id" } as never
+    );
+
+  // 4. Set active-company cookie and redirect.
   const c = await cookies();
   c.set(ACTIVE_COMPANY_COOKIE, company.id, {
     path: "/",
@@ -59,7 +125,9 @@ async function createCompanyAction(formData: FormData) {
   redirect("/dashboard");
 }
 
-export default async function CreateCompanyPage() {
+export default async function CreateCompanyPage({ searchParams }: PageProps) {
+  const { error } = await searchParams;
+
   return (
     <div className="min-h-screen bg-gray-50 px-4 py-12 dark:bg-gray-950">
       <div className="mx-auto max-w-xl">
@@ -72,19 +140,25 @@ export default async function CreateCompanyPage() {
             Each company is its own workspace. You can create more later.
           </p>
 
+          {error && (
+            <div className="mt-4 rounded-lg border border-error-200 bg-error-50 px-3 py-2 text-sm text-error-700 dark:border-error-500/40 dark:bg-error-500/10 dark:text-error-300">
+              {decodeFriendly(error)}
+            </div>
+          )}
+
           <form action={createCompanyAction} className="mt-6 space-y-5">
             <div>
-              <Label>Company name</Label>
-              <Input name="name" placeholder="Acme Inc." />
+              <Label htmlFor="name">Company name</Label>
+              <Input id="name" name="name" placeholder="Acme Inc." />
             </div>
             <div className="grid gap-5 sm:grid-cols-2">
               <div>
-                <Label>Industry (optional)</Label>
-                <Input name="industry" placeholder="SaaS, Agency, …" />
+                <Label htmlFor="industry">Industry (optional)</Label>
+                <Input id="industry" name="industry" placeholder="SaaS, Agency, …" />
               </div>
               <div>
-                <Label>Currency</Label>
-                <Input name="currency" defaultValue="USD" />
+                <Label htmlFor="currency">Currency</Label>
+                <Input id="currency" name="currency" defaultValue="USD" />
               </div>
             </div>
             <button
@@ -98,4 +172,9 @@ export default async function CreateCompanyPage() {
       </div>
     </div>
   );
+}
+
+function decodeFriendly(code: string) {
+  if (code === "name_required") return "Please enter a company name.";
+  return decodeURIComponent(code);
 }

@@ -537,9 +537,15 @@ drop policy if exists "companies_select" on public.companies;
 create policy "companies_select" on public.companies
   for select using (is_company_member(id));
 
+-- Any authenticated user can create their first (or additional) company.
+-- We require them to set themselves as the owner — they cannot insert a
+-- row owned by someone else. The `ensure_owner_membership` trigger then
+-- auto-creates their `company_members` row with role = owner.
 drop policy if exists "companies_insert" on public.companies;
 create policy "companies_insert" on public.companies
-  for insert with check (auth.uid() = owner_id);
+  for insert
+  to authenticated
+  with check (auth.uid() = owner_id);
 
 drop policy if exists "companies_update" on public.companies;
 create policy "companies_update" on public.companies
