@@ -14,6 +14,14 @@ create extension if not exists "uuid-ossp";
 create extension if not exists "pgcrypto";
 create extension if not exists "citext";
 
+-- Allow forward references inside function bodies. Several helpers
+-- (`is_company_member`, `has_company_role`, `auth_company_ids`) read
+-- from `public.company_members`, which is created later in this file.
+-- Postgres validates `language sql` function bodies at definition time
+-- by default — turning the check off here makes the migration safe to
+-- apply in one shot. The bodies are still validated on first call.
+set check_function_bodies = off;
+
 -- ---------------------------------------------------------------------
 -- Enums
 -- ---------------------------------------------------------------------
@@ -69,7 +77,7 @@ do $$ begin
 exception when duplicate_object then null; end $$;
 
 -- ---------------------------------------------------------------------
--- Helper functions
+-- Helper functions (basic)
 -- ---------------------------------------------------------------------
 
 -- updated_at trigger
@@ -80,33 +88,9 @@ begin
   return new;
 end $$;
 
--- Returns the set of company_ids the current auth.uid() belongs to.
-create or replace function auth_company_ids()
-returns setof uuid language sql security definer stable as $$
-  select company_id
-  from public.company_members
-  where user_id = auth.uid();
-$$;
-
--- Returns true if current user is a member of the given company.
-create or replace function is_company_member(c_id uuid)
-returns boolean language sql security definer stable as $$
-  select exists (
-    select 1 from public.company_members
-    where company_id = c_id and user_id = auth.uid()
-  );
-$$;
-
--- Returns true if current user has at least one of the given roles in company.
-create or replace function has_company_role(c_id uuid, roles company_role[])
-returns boolean language sql security definer stable as $$
-  select exists (
-    select 1 from public.company_members
-    where company_id = c_id
-      and user_id = auth.uid()
-      and role = any(roles)
-  );
-$$;
+-- Company-membership helpers are defined further below, after the
+-- `company_members` table exists. `set check_function_bodies = off`
+-- above lets us forward-declare them safely if the order ever shifts.
 
 -- ---------------------------------------------------------------------
 -- companies
@@ -146,6 +130,39 @@ create table if not exists public.company_members (
 create index if not exists company_members_user_idx on public.company_members(user_id);
 create index if not exists company_members_company_idx on public.company_members(company_id);
 
+-- ---------------------------------------------------------------------
+-- Membership helper functions
+-- (defined here, after `company_members` exists, for clarity)
+-- ---------------------------------------------------------------------
+
+-- Returns the set of company_ids the current auth.uid() belongs to.
+create or replace function auth_company_ids()
+returns setof uuid language sql security definer stable as $$
+  select company_id
+  from public.company_members
+  where user_id = auth.uid();
+$$;
+
+-- Returns true if current user is a member of the given company.
+create or replace function is_company_member(c_id uuid)
+returns boolean language sql security definer stable as $$
+  select exists (
+    select 1 from public.company_members
+    where company_id = c_id and user_id = auth.uid()
+  );
+$$;
+
+-- Returns true if current user has at least one of the given roles in company.
+create or replace function has_company_role(c_id uuid, roles company_role[])
+returns boolean language sql security definer stable as $$
+  select exists (
+    select 1 from public.company_members
+    where company_id = c_id
+      and user_id = auth.uid()
+      and role = any(roles)
+  );
+$$;
+
 -- Auto-add owner as company_member upon company creation
 create or replace function ensure_owner_membership()
 returns trigger language plpgsql security definer as $$
@@ -170,7 +187,7 @@ create table if not exists public.projects (
   name         text not null,
   description  text,
   status       project_status not null default 'planning',
-  client_id    uuid references public.crm_contacts(id) on delete set null,
+  client_id    uuid,                          -- FK added below after crm_contacts exists
   budget       numeric(14,2),
   start_date   date,
   due_date     date,
@@ -272,12 +289,16 @@ create index if not exists crm_activities_contact_idx on public.crm_activities(c
 create index if not exists crm_activities_deal_idx on public.crm_activities(deal_id);
 
 -- Now add the FK from projects.client_id back into crm_contacts (created above)
-do $$ begin
-  alter table public.projects
-    add constraint projects_client_fk
-    foreign key (client_id) references public.crm_contacts(id) on delete set null;
-exception when duplicate_object then null;
-when others then null; end $$;
+do $$
+begin
+  if not exists (
+    select 1 from pg_constraint where conname = 'projects_client_fk'
+  ) then
+    alter table public.projects
+      add constraint projects_client_fk
+      foreign key (client_id) references public.crm_contacts(id) on delete set null;
+  end if;
+end $$;
 
 -- ---------------------------------------------------------------------
 -- Invoicing
