@@ -1,5 +1,5 @@
 /**
- * Strongly-typed `process.env` for the Nova BusinessOS app.
+ * Strongly-typed `process.env` for the MaBusinessOS app.
  *
  * Anything declared here is **purely a type-level hint** — values still
  * come from the runtime environment. Required variables are validated at

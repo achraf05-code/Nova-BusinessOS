@@ -4,7 +4,7 @@ import Link from "next/link";
 export const metadata: Metadata = {
   title: "Blog",
   description:
-    "Product updates, operator playbooks and AI CFO insights from the Nova BusinessOS team.",
+    "Product updates, operator playbooks and AI CFO insights from the MaBusinessOS team.",
 };
 
 const posts = [

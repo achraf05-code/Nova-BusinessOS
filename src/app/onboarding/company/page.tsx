@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "Create your company",
-  description: "Set up your first Nova BusinessOS workspace.",
+  description: "Set up your first MaBusinessOS workspace.",
 };
 
 interface PageProps {

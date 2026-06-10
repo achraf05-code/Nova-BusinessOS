@@ -7,7 +7,7 @@ interface Props {
 }
 
 /**
- * Nova BusinessOS wordmark + glyph. Pure SVG so it inherits text color
+ * MaBusinessOS wordmark + glyph. Pure SVG so it inherits text color
  * (works in both light and dark mode without any image assets).
  */
 const NovaLogo: React.FC<Props> = ({
@@ -33,7 +33,7 @@ const NovaLogo: React.FC<Props> = ({
       </defs>
       <rect width="32" height="32" rx="8" fill="url(#nova-grad)" />
       <path
-        d="M9 22V10h2.4l8.2 8.4V10H22v12h-2.4l-8.2-8.4V22H9z"
+        d="M9 9h2.6l4.4 8.4 4.4-8.4H23v14h-2.4v-9.4l-3.6 6.8h-2L11.4 13.6V23H9V9z"
         fill="white"
       />
     </svg>
@@ -48,7 +48,7 @@ const NovaLogo: React.FC<Props> = ({
       {Glyph}
       <span className="flex flex-col leading-tight">
         <span className="text-[15px] font-semibold tracking-tight">
-          Nova BusinessOS
+          MaBusinessOS
         </span>
         <span className="text-[10px] uppercase tracking-[0.16em] text-gray-400 dark:text-gray-500">
           AI Business OS

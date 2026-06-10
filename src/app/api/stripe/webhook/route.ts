@@ -76,7 +76,7 @@ export async function POST(req: Request) {
           companyId,
           type: "system",
           title: `Subscription activated · ${plan}`,
-          body: "Welcome to Nova BusinessOS!",
+          body: "Welcome to MaBusinessOS!",
           href: "/dashboard/billing",
         });
         break;

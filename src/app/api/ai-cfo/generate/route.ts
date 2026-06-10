@@ -130,7 +130,7 @@ async function emailDigestToOptedInMembers(args: {
     const optedIn = store.preferences.filter((p) => p.email_ai_cfo_reports);
     for (let i = 0; i < optedIn.length; i++) {
       await sendEmail({
-        to: "demo@nova-businessos.com",
+        to: "demo@mabusinessos.com",
         subject: tpl.subject,
         html: tpl.html,
         template: "ai_cfo_report",

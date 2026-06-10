@@ -3,7 +3,7 @@ import SignUpForm from "@/components/auth/SignUpForm";
 
 export const metadata: Metadata = {
   title: "Create account",
-  description: "Create your Nova BusinessOS workspace.",
+  description: "Create your MaBusinessOS workspace.",
 };
 
 export default function RegisterPage() {

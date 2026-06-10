@@ -102,7 +102,7 @@ export default function Hero() {
             transition={{ duration: 0.7, delay: 0.15 }}
             className="mx-auto mt-6 max-w-2xl text-base text-gray-600 dark:text-gray-300 sm:text-lg"
           >
-            Nova BusinessOS unifies CRM, projects, invoicing, expenses,
+            MaBusinessOS unifies CRM, projects, invoicing, expenses,
             accounting and an always-on AI CFO. Replace 12 disconnected SaaS
             tools with a single, multi-tenant workspace built for modern teams.
           </motion.p>
@@ -178,7 +178,7 @@ export default function Hero() {
                 <span className="h-2.5 w-2.5 rounded-full bg-success-400" />
                 <span className="ml-3 inline-flex items-center gap-1 rounded-md bg-white px-2 py-0.5 text-[11px] text-gray-500 ring-1 ring-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:ring-gray-700">
                   <LockIcon />
-                  app.nova-businessos.com / dashboard
+                    app.mabusinessos.com / dashboard
                 </span>
               </div>
               {/* KPI strip */}

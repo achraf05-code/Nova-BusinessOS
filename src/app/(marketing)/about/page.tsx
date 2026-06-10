@@ -4,7 +4,7 @@ import { nova } from "@/config/nova";
 export const metadata: Metadata = {
   title: "About",
   description:
-    "Nova BusinessOS is the AI-powered operating system for modern businesses. Read about our mission, team and values.",
+    "MaBusinessOS is the AI-powered operating system for modern businesses. Read about our mission, team and values.",
 };
 
 export default function AboutPage() {

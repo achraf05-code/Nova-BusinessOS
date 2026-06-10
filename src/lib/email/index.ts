@@ -35,7 +35,7 @@ export interface EmailResult {
 }
 
 const FROM =
-  process.env.EMAIL_FROM ?? "Nova BusinessOS <hello@nova-businessos.com>";
+  process.env.EMAIL_FROM ?? "MaBusinessOS <hello@mabusinessos.com>";
 
 export async function sendEmail(input: SendEmailInput): Promise<EmailResult> {
   if (process.env.RESEND_API_KEY) {

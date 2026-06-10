@@ -1,6 +1,6 @@
 <div align="center">
 
-# Nova BusinessOS
+# MaBusinessOS
 
 **The AI-Powered Business Operating System.**
 CRM, projects, invoicing, expenses, accounting and an always-on AI CFO — unified for modern teams.
@@ -40,7 +40,7 @@ CRM, projects, invoicing, expenses, accounting and an always-on AI CFO — unifi
 
 ## Vision
 
-Modern teams shouldn't need 12 SaaS tools to run a business. **Nova BusinessOS** unifies CRM, projects, invoicing, expenses, accounting and an always-on AI CFO into a single, multi-tenant workspace — built for founders and operators who refuse to glue together a stack.
+Modern teams shouldn't need 12 SaaS tools to run a business. **MaBusinessOS** unifies CRM, projects, invoicing, expenses, accounting and an always-on AI CFO into a single, multi-tenant workspace — built for founders and operators who refuse to glue together a stack.
 
 Our mission: give every team the operational leverage of a well-funded company, minus the integration tax.
 
@@ -136,7 +136,7 @@ Everything is **fully responsive**, **dark-mode native**, and built on a single 
 ## Architecture
 
 ```
-nova-businessos/
+mabusinessos/
 ├── src/
 │   ├── app/                    # Next.js 15 App Router
 │   │   ├── (marketing)/        # Public landing pages
@@ -258,7 +258,7 @@ psql "$DATABASE_URL" -f supabase/seed.sql        # optional sample data
 
 ```bash
 git clone <your-fork>
-cd nova-businessos
+cd mabusinessos
 npm install --legacy-peer-deps
 cp .env.example .env.local       # fill in real values
 npm run dev                      # http://localhost:3000
@@ -280,7 +280,7 @@ All variables are documented inline in [`.env.example`](./.env.example). At a gl
 | `NEXT_PUBLIC_APP_URL` | ✅ | Production base URL (used in emails + OG) |
 | `NEXT_PUBLIC_APP_NAME` | – | Display name override |
 | `RESEND_API_KEY` | recommended | Transactional email (Invitations, invoices, AI CFO digest) |
-| `EMAIL_FROM` | recommended | Sender, e.g. `Nova BusinessOS <hello@yourdomain.com>` |
+| `EMAIL_FROM` | recommended | Sender, e.g. `MaBusinessOS <hello@yourdomain.com>` |
 | `STRIPE_SECRET_KEY` | for paid plans | Stripe API key |
 | `STRIPE_WEBHOOK_SECRET` | for paid plans | Verifies webhooks at `/api/stripe/webhook` |
 | `STRIPE_PRICE_STARTER` / `_BUSINESS` / `_ENTERPRISE` | for paid plans | Stripe price IDs |
@@ -388,6 +388,6 @@ For an exhaustive sprint-by-sprint breakdown of what shipped, see:
 
 ## License
 
-Proprietary. © Nova BusinessOS. All rights reserved.
+Proprietary. © MaBusinessOS. All rights reserved.
 
-<sub>Logo & wordmark are part of the Nova BusinessOS brand. Built with care on top of Next.js, Supabase and Stripe.</sub>
+<sub>Logo & wordmark are part of the MaBusinessOS brand. Built with care on top of Next.js, Supabase and Stripe.</sub>

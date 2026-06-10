@@ -6,7 +6,7 @@ import Cta from "@/components/marketing/Cta";
 export const metadata: Metadata = {
   title: "Features",
   description:
-    "CRM, projects, invoicing, expenses, accounting and an AI CFO — every Nova BusinessOS module in one place.",
+    "CRM, projects, invoicing, expenses, accounting and an AI CFO — every MaBusinessOS module in one place.",
 };
 
 export default function FeaturesPage() {

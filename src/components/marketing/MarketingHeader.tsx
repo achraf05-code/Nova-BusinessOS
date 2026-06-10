@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
-import { marketingNav } from "@/config/nova";
+import { marketingNav, nova } from "@/config/nova";
 import NovaLogo from "@/components/brand/NovaLogo";
 import { ThemeToggleButton } from "@/components/common/ThemeToggleButton";
 
@@ -25,7 +25,7 @@ export default function MarketingHeader() {
       }`}
     >
       <div className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
-        <Link href="/" aria-label="Nova BusinessOS home">
+        <Link href="/" aria-label={`${nova.name} home`}>
           <NovaLogo className="text-gray-900 dark:text-white" />
         </Link>
 

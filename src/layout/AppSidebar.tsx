@@ -13,6 +13,7 @@ import {
   type DashboardNavItem,
 } from "@/config/dashboardNav";
 import NovaLogo from "@/components/brand/NovaLogo";
+import { nova } from "@/config/nova";
 
 const AppSidebar: React.FC = () => {
   const { isExpanded, isMobileOpen, isHovered, setIsHovered } = useSidebar();
@@ -199,7 +200,7 @@ const AppSidebar: React.FC = () => {
           !isExpanded && !isHovered ? "lg:justify-center" : "justify-start"
         }`}
       >
-        <Link href="/dashboard" aria-label="Nova BusinessOS">
+        <Link href="/dashboard" aria-label={nova.name}>
           <NovaLogo
             collapsed={!(isExpanded || isHovered || isMobileOpen)}
             className="text-gray-900 dark:text-white"

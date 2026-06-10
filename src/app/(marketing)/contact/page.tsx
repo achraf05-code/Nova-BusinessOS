@@ -4,7 +4,7 @@ import { nova } from "@/config/nova";
 
 export const metadata: Metadata = {
   title: "Contact",
-  description: "Talk to the Nova BusinessOS team — sales, support or partnerships.",
+  description: "Talk to the MaBusinessOS team — sales, support or partnerships.",
 };
 
 export default function ContactPage() {

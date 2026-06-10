@@ -159,7 +159,7 @@ export default function ProductShowcase() {
                   <span className="h-2.5 w-2.5 rounded-full bg-warning-400" />
                   <span className="h-2.5 w-2.5 rounded-full bg-success-400" />
                   <span className="ml-3 text-[11px] text-gray-500">
-                    nova-businessos.com / dashboard / {active}
+                    mabusinessos.com / dashboard / {active}
                   </span>
                 </div>
                 <AnimatePresence mode="wait">

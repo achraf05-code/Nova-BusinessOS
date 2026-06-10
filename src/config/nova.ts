@@ -1,24 +1,24 @@
 /**
- * Centralized brand + product configuration for Nova BusinessOS.
+ * Centralized brand + product configuration for MaBusinessOS.
  */
 
 export const nova = {
-  name: "Nova BusinessOS",
-  shortName: "Nova",
+  name: "MaBusinessOS",
+  shortName: "MaBusiness",
   tagline: "AI-Powered Business Operating System",
   description:
     "Manage your CRM, projects, invoices, expenses, accounting and AI CFO " +
     "insights from a single, unified workspace.",
-  url: process.env.NEXT_PUBLIC_APP_URL ?? "https://nova-businessos.com",
+  url: process.env.NEXT_PUBLIC_APP_URL ?? "https://mabusinessos.com",
   contact: {
-    email: "hello@nova-businessos.com",
-    sales: "sales@nova-businessos.com",
-    support: "support@nova-businessos.com",
+    email: "hello@mabusinessos.com",
+    sales: "sales@mabusinessos.com",
+    support: "support@mabusinessos.com",
   },
   social: {
-    twitter: "https://twitter.com/novabusinessos",
-    linkedin: "https://linkedin.com/company/novabusinessos",
-    github: "https://github.com/nova-businessos",
+    twitter: "https://twitter.com/mabusinessos",
+    linkedin: "https://linkedin.com/company/mabusinessos",
+    github: "https://github.com/mabusinessos",
   },
 } as const;
 
@@ -150,14 +150,14 @@ export const moduleHighlights = [
 
 export const faqs = [
   {
-    q: "What is Nova BusinessOS?",
+    q: "What is MaBusinessOS?",
     a:
-      "Nova BusinessOS is an AI-powered operating system for businesses. It " +
+      "MaBusinessOS is an AI-powered operating system for businesses. It " +
       "unifies CRM, projects, invoicing, expenses, accounting and an AI CFO " +
       "assistant in a single multi-tenant workspace.",
   },
   {
-    q: "Is Nova multi-tenant?",
+    q: "Is MaBusinessOS multi-tenant?",
     a:
       "Yes. Every user can own one or many companies, and every record is " +
       "isolated by company_id with strict Postgres Row Level Security.",
@@ -165,7 +165,7 @@ export const faqs = [
   {
     q: "How does the AI CFO work?",
     a:
-      "Nova analyzes your revenue, expenses, clients and projects, then " +
+      "MaBusinessOS analyzes your revenue, expenses, clients and projects, then " +
       "generates recommendations, insights and forecasts. Reports are " +
       "stored historically so you can review trends over time.",
   },
@@ -178,7 +178,7 @@ export const faqs = [
   {
     q: "Where is my data stored?",
     a:
-      "Nova runs on Supabase (Postgres, Auth, Storage). You retain full " +
+      "MaBusinessOS runs on Supabase (Postgres, Auth, Storage). You retain full " +
       "ownership and can export anytime as CSV, Excel or PDF.",
   },
 ] as const;

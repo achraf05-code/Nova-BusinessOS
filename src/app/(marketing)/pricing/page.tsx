@@ -5,7 +5,7 @@ import Faq from "@/components/marketing/Faq";
 export const metadata: Metadata = {
   title: "Pricing",
   description:
-    "Simple per-company pricing for Nova BusinessOS. Start free, upgrade when your team grows.",
+    "Simple per-company pricing for MaBusinessOS. Start free, upgrade when your team grows.",
 };
 
 export default function PricingPage() {

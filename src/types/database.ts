@@ -1,5 +1,5 @@
 /**
- * Nova BusinessOS — Supabase database types.
+ * MaBusinessOS — Supabase database types.
  *
  * This is a compact, hand-curated mirror of the SQL schema in
  * `supabase/supabase_schema.sql`. Regenerate with the Supabase CLI for the

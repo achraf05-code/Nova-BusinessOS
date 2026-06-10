@@ -1,5 +1,5 @@
 -- =====================================================================
--- Nova BusinessOS — Production Supabase schema
+-- MaBusinessOS — Production Supabase schema
 -- =====================================================================
 -- Multi-tenant SaaS schema. Every business resource is scoped by
 -- `company_id`. Row Level Security is enabled on every table and policies

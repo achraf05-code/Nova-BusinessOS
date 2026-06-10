@@ -1,8 +1,8 @@
 {
-  "name": "nova-businessos",
+  "name": "mabusinessos",
   "version": "1.0.0",
   "private": true,
-  "description": "Nova BusinessOS - AI-Powered Business Operating System",
+  "description": "MaBusinessOS - AI-Powered Business Operating System",
   "engines": {
     "node": ">=20.x"
   },

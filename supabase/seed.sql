@@ -1,5 +1,5 @@
 -- =====================================================================
--- Nova BusinessOS — Demo seed
+-- MaBusinessOS — Demo seed
 -- =====================================================================
 -- Run this against a local Supabase instance after `supabase_schema.sql`.
 -- Replace `<DEMO_USER_ID>` with the auth.users.id of your dev account.

@@ -18,13 +18,13 @@ function shell(title: string, body: string) {
   <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background:${BG};padding:32px 16px">
     <tr><td align="center">
       <table role="presentation" width="560" cellspacing="0" cellpadding="0" border="0" style="background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px rgba(16,24,40,0.05)">
-        <tr><td style="background:${BRAND};padding:18px 28px;color:#fff;font-weight:600;font-size:14px;letter-spacing:.04em;text-transform:uppercase">Nova BusinessOS</td></tr>
+        <tr><td style="background:${BRAND};padding:18px 28px;color:#fff;font-weight:600;font-size:14px;letter-spacing:.04em;text-transform:uppercase">${escapeHtml(nova.name)}</td></tr>
         <tr><td style="padding:28px">
           <h1 style="margin:0 0 12px;font-size:20px;color:${FG}">${escapeHtml(title)}</h1>
           ${body}
         </td></tr>
         <tr><td style="padding:18px 28px;border-top:1px solid #eef0f3;color:${MUTED};font-size:12px">
-          ${escapeHtml(nova.tagline)} · <a href="${APP_URL}" style="color:${BRAND};text-decoration:none">nova-businessos.com</a>
+          ${escapeHtml(nova.tagline)} · <a href="${APP_URL}" style="color:${BRAND};text-decoration:none">mabusinessos.com</a>
         </td></tr>
       </table>
     </td></tr>
@@ -60,9 +60,9 @@ export interface InvitationEmailArgs {
   acceptUrl: string;
 }
 export function invitationEmail(args: InvitationEmailArgs) {
-  const subject = `You're invited to ${args.companyName} on Nova BusinessOS`;
+  const subject = `You're invited to ${args.companyName} on ${nova.name}`;
   const html = shell(
-    `Join ${escapeHtml(args.companyName)} on Nova BusinessOS`,
+    `Join ${escapeHtml(args.companyName)} on ${escapeHtml(nova.name)}`,
     `
       ${p(`${escapeHtml(args.inviterName)} has invited you to join <strong>${escapeHtml(args.companyName)}</strong> as <strong>${escapeHtml(args.role)}</strong>.`)}
       ${p(button(args.acceptUrl, "Accept invitation"))}
@@ -116,7 +116,7 @@ export interface WelcomeEmailArgs {
   dashboardUrl: string;
 }
 export function welcomeEmail(args: WelcomeEmailArgs) {
-  const subject = `Welcome to ${args.companyName} on Nova BusinessOS`;
+  const subject = `Welcome to ${args.companyName} on ${nova.name}`;
   const html = shell(
     `Welcome${args.fullName ? `, ${escapeHtml(args.fullName)}` : ""}`,
     `

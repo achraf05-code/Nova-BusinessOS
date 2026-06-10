@@ -4,7 +4,7 @@ import SignInForm from "@/components/auth/SignInForm";
 
 export const metadata: Metadata = {
   title: "Sign in",
-  description: "Sign in to your Nova BusinessOS workspace.",
+  description: "Sign in to your MaBusinessOS workspace.",
 };
 
 export default function LoginPage() {

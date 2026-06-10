@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: `${nova.name} — ${nova.tagline}`,
     description: nova.description,
-    creator: "@novabusinessos",
+    creator: "@mabusinessos",
   },
   icons: {
     icon: [{ url: "/favicon.ico" }],

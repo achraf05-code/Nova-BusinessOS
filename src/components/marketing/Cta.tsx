@@ -70,7 +70,7 @@ export default function Cta() {
                 .
               </h2>
               <p className="mx-auto mt-5 max-w-xl text-sm text-white/85 sm:text-base">
-                Nova BusinessOS replaces a dozen SaaS tools with one unified
+                MaBusinessOS replaces a dozen SaaS tools with one unified
                 workspace. Start free in under two minutes — no credit card,
                 no migration headache.
               </p>

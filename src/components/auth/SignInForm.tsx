@@ -66,7 +66,7 @@ export default function SignInForm() {
           Welcome back
         </h1>
         <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
-          Sign in to your Nova BusinessOS workspace.
+          Sign in to your MaBusinessOS workspace.
         </p>
       </div>
 

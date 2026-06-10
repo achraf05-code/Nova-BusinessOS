@@ -18,7 +18,7 @@ const DEMO_COMPANY: Company = {
   updated_at: new Date().toISOString(),
 };
 
-const DEMO_USER = { id: "demo-user", email: "demo@nova-businessos.com" };
+const DEMO_USER = { id: "demo-user", email: "demo@mabusinessos.com" };
 
 /**
  * Resolve the active company for the signed-in user. The active company is
